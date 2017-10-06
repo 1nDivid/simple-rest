@@ -2,10 +2,10 @@ package ru.individ.simplerest.entities;
 
 /**
  * Data model
+ *
  * @author Aleksandr Deryugin
  */
-public class Transaction {
-    public Long id;
+public class Transaction extends AbstractEntity {
     public Long senderId;
     public Long recipientId;
     public Double amount;

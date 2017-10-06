@@ -4,77 +4,55 @@ import ru.individ.simplerest.entities.Transaction;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
  * Data access object for {@link Transaction}
+ *
  * @author Aleksandr Deryugin
  */
-public class TransactionsDao {
-    // in-memory store
-    private final ConcurrentMap<Long, Transaction> data;
-    // track last entity id
-    private Long lastId = 0L;
+public class TransactionsDao extends AbstractDao<Transaction> {
+    private static TransactionsDao instance;
 
-    public TransactionsDao() {
-        data = new ConcurrentHashMap<>();
+    public static TransactionsDao getInstance() {
+        if (instance == null) {
+            instance = new TransactionsDao();
+        }
+        return instance;
+    }
+
+    private TransactionsDao() {
+        super();
     }
 
     /**
-     * Find transaction by id
-     * @param id unique id of transaction
-     * @return matching transaction or null if nothing found
+     * Find transactions by account id
+     *
+     * @param accountId unique account id
+     * @return list of transactions where account is sender or recipient
      */
-    public Transaction findOne(Long id) {
-        return data.get(id);
-    }
-
-    /**
-     * Get list of all transactions
-     * @return list of transactions
-     */
-    public List<Transaction> findAll() {
+    public List<Transaction> findByAccount(Long accountId) {
         return data.values()
                 .stream()
-                .sorted(Comparator.comparing((Transaction t) -> t.id))
+                .filter(t -> (t.senderId.equals(accountId) || t.recipientId.equals(accountId)))
+                .sorted(Comparator.comparing((Transaction t) -> t.id).reversed())
                 .collect(Collectors.toList());
     }
 
     /**
-     * Create and store new transaction
-     * @param senderId unique id of sender account
-     * @param recipientId unique id of recipient account
-     * @param amount transfer sum
-     * @return newly created transaction
+     * Find transactions by account id and transaction id
+     *
+     * @param accountId     unique account id
+     * @param transactionId unique transaction id
+     * @return transaction where account is sender or recipient / null if nothing found
      */
-    public Transaction create(Long senderId, Long recipientId, Double amount) {
-        lastId++;
-
-        Transaction transaction = new Transaction(lastId, senderId, recipientId, amount);
-        data.put(lastId, transaction);
-        return transaction;
-    }
-
-    /**
-     * Update existing transaction, completely rewrites old one
-     * @param entity updated transaction
-     * @return update transaction or null if nothing to update
-     */
-    public Transaction update(Transaction entity) {
-        if (data.replace(entity.id, entity) == null) {
+    public Transaction findByAccountAndId(Long accountId, Long transactionId) {
+        Transaction transaction = data.get(transactionId);
+        if (transaction != null
+                && (transaction.senderId.equals(accountId) || transaction.recipientId.equals(accountId))) {
+            return transaction;
+        } else {
             return null;
         }
-        return entity;
-    }
-
-    /**
-     * Delete existing transaction
-     * @param id unique id of transaction
-     * @return true if transaction has been deleted, false if transaction not exists
-     */
-    public boolean delete(Long id) {
-        return data.remove(id) != null;
     }
 }

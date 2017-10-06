@@ -5,6 +5,7 @@ import spark.Response;
 
 /**
  * Controller to handler errors
+ *
  * @author Aleksandr Deryugin
  */
 public class ErrorsController {
