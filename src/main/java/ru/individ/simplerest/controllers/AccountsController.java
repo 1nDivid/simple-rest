@@ -27,12 +27,16 @@ public class AccountsController {
     public static Account read(Request req, Response res) {
         Account response = null;
 
-        Long accountId = Long.valueOf(req.params("accountId"));
-        Account account = accountsDao.findOne(accountId);
-        if (account != null) {
-            response = account;
-        } else {
-            res.status(404);
+        try {
+            Long accountId = Long.valueOf(req.params("accountId"));
+            Account account = accountsDao.findOne(accountId);
+            if (account != null) {
+                response = account;
+            } else {
+                res.status(404);
+            }
+        } catch (NumberFormatException ex) {
+            res.status(400);
         }
         return response;
     }
