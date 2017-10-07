@@ -29,6 +29,7 @@ public class TransactionsController {
      */
     public static Transaction create(Request req, Response res) {
         Transaction response = null;
+        res.status(201);
 
         try {
             TransferDto transfer = mapper.readValue(req.body(), TransferDto.class);

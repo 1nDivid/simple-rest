@@ -31,7 +31,7 @@ class RestServiceTest {
         AccountDto phillipDto = new AccountDto("Phillip", 35000.00);
         JsonPath phillip = given().config(config)
                 .body(phillipDto).post(url + "/accounts")
-                .then().statusCode(200)
+                .then().statusCode(201)
                 .assertThat().body("id", notNullValue())
                 .assertThat().body("name", is(phillipDto.name))
                 .assertThat().body("balance", is(phillipDto.balance))
@@ -39,7 +39,7 @@ class RestServiceTest {
         AccountDto markDto = new AccountDto("Mark", 5000.00);
         JsonPath mark = given().config(config)
                 .body(markDto).post(url + "/accounts")
-                .then().statusCode(200)
+                .then().statusCode(201)
                 .assertThat().body("id", notNullValue())
                 .assertThat().body("name", is(markDto.name))
                 .assertThat().body("balance", is(markDto.balance))
@@ -68,7 +68,7 @@ class RestServiceTest {
         String transferUrl = String.format("%s/accounts/%d/transfers", url, phillipId);
         JsonPath transaction = given().config(config)
                 .body(transferDto).post(transferUrl)
-                .then().statusCode(200)
+                .then().statusCode(201)
                 .assertThat().body("id", notNullValue())
                 .assertThat().body("senderId.toLong()", is(phillipId))
                 .assertThat().body("recipientId.toLong()", is(markId))
@@ -101,7 +101,7 @@ class RestServiceTest {
         AccountDto oliverDto = new AccountDto("Oliver", 2500.00);
         JsonPath oliver = given().config(config)
                 .body(oliverDto).post(url + "/accounts")
-                .then().statusCode(200)
+                .then().statusCode(201)
                 .extract().body().jsonPath();
 
         long oliverId = oliver.getLong("id");
@@ -111,7 +111,7 @@ class RestServiceTest {
         transferUrl = String.format("%s/accounts/%d/transfers", url, oliverId);
         transaction = given().config(config)
                 .body(transferDto).post(transferUrl)
-                .then().statusCode(200)
+                .then().statusCode(201)
                 .extract().body().jsonPath();
 
         // Phillip must not see this transaction

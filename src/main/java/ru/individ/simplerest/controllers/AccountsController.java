@@ -55,12 +55,15 @@ public class AccountsController {
      */
     public static Account create(Request req, Response res) {
         Account response = null;
+        res.status(201);
 
         try {
             AccountDto dto = mapper.readValue(req.body(), AccountDto.class);
             if (dto.name != null && !"".equals(dto.name.trim()) && dto.balance != null) {
                 Account account = new Account(null, dto.name, dto.balance);
                 response = accountsDao.create(account);
+            } else {
+                res.status(400);
             }
         } catch (IOException e) {
             res.status(400);
@@ -85,6 +88,8 @@ public class AccountsController {
                 } else {
                     res.status(404);
                 }
+            } else {
+                res.status(400);
             }
         } catch (NumberFormatException | IOException e) {
             res.status(400);
