@@ -129,5 +129,12 @@ class RestServiceTest {
                 .assertThat().body("senderId.toLong()", is(oliverId))
                 .assertThat().body("recipientId.toLong()", is(markId))
                 .assertThat().body("amount", is(transferDto.amount));
+
+        // test that we cannot transfer more than we have
+        transferDto = new TransferDto(markId, 5000.00);
+        transferUrl = String.format("%s/accounts/%d/transfers", url, oliverId);
+        given().config(config)
+                .body(transferDto).post(transferUrl)
+                .then().statusCode(400);
     }
 }
